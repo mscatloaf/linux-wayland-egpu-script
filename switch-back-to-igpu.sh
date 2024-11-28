@@ -1,15 +1,22 @@
 #!/bin/bash
 
-IGPU_PATH="/sys/bus/pci/devices/0000:00:02.0"
-EGPU_PATH="/sys/bus/pci/devices/0000:03:00.0"
+IGPU_PCI_ID="0000:00:02.0"
+EGPU_PCI_ID="0000:2e:00.0"
+
+IGPU_PATH="/sys/bus/pci/devices/$IGPU_PCI_ID"
+EGPU_PATH="/sys/bus/pci/devices/$EGPU_PCI_ID"
+
+
 SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-echo WARNING, this script is likely to leave your system in an unusable state which requires a forced power off
-echo SAVE ANY UNSAVED WORK BEFORE RUNNING THIS SCRIPT
-read -p "press ENTER to continue"
-
+#undo what the switch script did
 sudo umount $IGPU_PATH/boot_vga
 sudo umount $EGPU_PATH/boot_vga
+
+#unbind the egpu
+echo -n $EGPU_PCI_ID | sudo tee /sys/bus/pci/drivers/amdgpu/unbind
+sleep 1
+sudo rmmod amdgpu #this line is optional and should probably be commented out on amd laptops
 sudo systemctl restart display-manager
 
 
