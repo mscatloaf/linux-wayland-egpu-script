@@ -1,6 +1,8 @@
 # linux-wayland-egpu-script
  
-A script I created to get my egpu working on linux. switch-to-egpu.sh sets the egpu as the "boot_vga" device improving performance and making DRI_PRIME unnecessary. switch-back-to-igpu.sh tries to undo what the switching script does, but it usually leaves the system in an unusable state or locked up, in most cases it is better to reboot or shutdown.
+A script I created to get my egpu working on linux. switch-to-egpu.sh sets the egpu as the "boot_vga" device improving performance and making DRI_PRIME unnecessary. switch-back-to-igpu.sh undoes the changes to boot_vga and tries to unbind the egpu and remove the graphics driver (assuming you have an Intel iGPU and amd eGPU like I do, if not you will need to modify the script to make it unbind your eGPU.
+
+It is possible that your desktop session will crash before execution is finished, especially with switch-back-to-igpu.sh, if the scripts work when you run them from a tty, but not from inside your desktop environment, this is probably whats happening. A good solution would be to create a systemd service that runs the scripts. 
 
 Displays attached to the iGPU may still work, but I recommend going to your monitor settings and turning them off for maximum performance and stability.
 
